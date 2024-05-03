@@ -1,0 +1,16 @@
+{
+    "users": [
+        {
+            "user": "jitu",
+            "pass": "7ff7ff1f5c6db0fd5701394227a71eff044b18488765cf9a1ba56c64217090c2"
+        }
+    ],
+    "https": true,
+    "crt": "server.crt",
+    "key": "server.key",
+    "updates": "/Users/jenkins-lab4/iOS_UI/coordinator/stf_updates",
+    "install_dir": "/Users/jenkins-lab4/iOS_UI/coordinator/stf",
+    "config": "/Users/jenkins-lab4/iOS_UI/coordinatorf/config.json",
+    "update_host": "jenkins-lab4/192.168.113.103",
+    "update_port": 8022
+}

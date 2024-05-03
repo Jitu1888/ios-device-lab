@@ -1,0 +1,44 @@
+{
+  "wda": {
+    "error": "missing"
+  },
+  "h264_to_jpeg": {
+    "commit": "3e64b68b63e98e65973ef5e854cec6284c647ade",
+    "author": "David Helkowski <David.Helkowski1@T-Mobile.com>",
+    "date": "1590715181",
+    "remote": "https://github.com/nanoscopic/h264_to_jpeg.git"
+  },
+  "device_trigger": {
+    "commit": "241cb6bb5679d2595dc4886fb96e0a3ebf8fc544",
+    "author": "David Helkowski <git@codechild.com>",
+    "date": "1582584089",
+    "remote": "https://github.com/tmobile/osx_ios_device_trigger.git"
+  },
+  "stf": {
+    "commit": "00aa19027be83c4c21719598df494e068a03d7b9",
+    "author": "Pete Myron <pete.myron@t-mobile.com>",
+    "date": "1625783703",
+    "remote": "https://github.com/nanoscopic/stf-ios-provider.git"
+  },
+  "ios_video_stream": {
+    "commit": "0a906b183f8c46b73943a7117591f880d483daa2",
+    "author": "David Helkowski <github@codechild.com>",
+    "date": "1608602999",
+    "remote": "https://github.com/nanoscopic/ios_video_stream.git"
+  },
+  "wdaproxy": {
+    "commit": "494a71af9a6b0aab75d8c9aa620273357d9aedca",
+    "author": "David Helkowski <github@codechild.com>",
+    "date": "1608612648",
+    "remote": "https://github.com/nanoscopic/wdaproxy.git"
+  },
+  "ios_support": {
+    "error": "missing"
+  },
+  "ios_avf_pull": {
+    "commit": "e3ceecc61c4f924d6e1e268d166b0d850ec55812",
+    "author": "David Helkowski <david.helkowski1@t-mobile.com>",
+    "date": "1600913900",
+    "remote": "https://github.com/nanoscopic/ios_avf_pull.git"
+  }
+}

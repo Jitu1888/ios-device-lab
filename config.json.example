@@ -1,0 +1,78 @@
+// Minimal Example; DO NOT COPY THIS LINE OR ANY LINE STARTING WITH //
+// To get your xcode dev org, view "Apple Development" cert in keychain, and look at "Organizational Unit"
+{
+  "xcode_dev_team_id": "[your xcode developer org; ~10 char alphanumeric]",
+  "stf": {
+    "ip": "[your stf server ip]",
+    "hostname": "[your stf server hostname]"
+  },
+  "video": {
+    "enabled": true,
+    "use_vnc": true,
+    "vnc_scale": 2,
+    "vnc_password": "",
+    "frame_rate": 10
+  },
+  "install": {
+    "root_path": "[desired stf provider install folder]",
+    "config_path": "[desired stf provider install folder]/config.json",
+    "set_working_dir": false
+  }
+}
+
+// HERE AND BELOW IS TO SHOW DEFAULTS AND ALL OPTIONS
+// DO NOT COPY THIS INTO YOUR config.json FILE
+// Defaults
+{
+  "wda_folder": "./bin/wda",
+  "xcode_dev_team_id": "",
+  "network": {
+    "coordinator_port": 8027,
+    "video": "8000-8005",
+    "dev_ios": "9240-9250",
+    "vnc": "5901-5911",
+    "wda": "8100-8105",
+    "interface": "auto"
+  },
+  "stf": {
+    "ip": "",
+    "hostname": ""
+  },
+  "video": {
+    "enabled": true,
+    "use_vnc": false,
+    "vnc_scale": 2,
+    "vnc_password": "",
+    "frame_rate": 5
+  },
+  "install": {
+    "root_path": "",
+    "config_path": "",
+    "set_working_dir": false
+  },
+  "log": {
+    "main": "logs/coordinator",
+    "proc_lines": "logs/procs",
+    "wda_wrapper_stdout": "./logs/wda_wrapper_stdout",
+    "wda_wrapper_stderr": "./logs/wda_wrapper_stderr"
+  },
+  "vpn": {
+    "type": "none",
+    "ovpn_working_dir": "/usr/local/etc/openvpn",
+    "tblick_name": ""
+  },
+  "bin_paths": {
+    "wdaproxy": "bin/wdaproxy",
+    "device_trigger": "bin/osx_ios_device_trigger",
+    "video_enabler": "bin/osx_ios_video_enabler",
+    "mirrorfeed": "bin/mirrorfeed",
+    "openvpn": "/usr/local/opt/openvpn/sbin/openvpn",
+    "iproxy": "/usr/local/bin/iproxy",
+    "wdawrapper": "bin/wda_wrapper",
+    "ffmpeg": "bin/ffmpeg"
+  },
+  "repos": {
+    "stf": "https://github.com/nanoscopic/stf-ios-provider.git",
+    "wda": "https://github.com/appium/WebDriverAgent.git"
+  }
+}

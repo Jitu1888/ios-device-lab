@@ -1,0 +1,629 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Remote Control</title>
+  <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+  <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <!-- 可选的 Bootstrap 主题文件（一般不用引入） -->
+  <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+</head>
+<style>
+  * {
+    margin: 0px;
+    padding: 0px;
+  }
+  
+  .color-red {
+    color: red;
+  }
+  
+  html,
+  body {
+    height: 100%;
+    width: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"
+  }
+  
+  .height100p {
+    height: 100%;
+  }
+  
+  pre {
+    font-family: "Courier New";
+    padding: 10px;
+    border: 1px solid gray;
+  }
+  
+  .finger {
+    position: absolute;
+    border-style: solid;
+    border-radius: 50%;
+    border-color: white;
+    border-width: 1mm;
+    width: 6mm;
+    height: 6mm;
+    top: -3mm;
+    left: -3mm;
+    opacity: 0.7;
+    pointer-events: none;
+    background: red;
+    /*#464646;*/
+    /*background: red;*/
+    display: none;
+  }
+  
+  .finger-1 {
+    background-color: blue;
+  }
+  
+  .finger.active {
+    display: block;
+  }
+  
+  .finger.longClick {
+    border: 1mm solid rebeccapurple;
+  }
+  
+  .screen-img {
+    max-height: 100%;
+    max-width: 100%;
+    border: 1px solid gray;
+  }
+  
+  .screen-wraper {
+    position: relative;
+    display: inline-block;
+    height: 100%;
+  }
+  
+  .cursor-pointer {
+    cursor: pointer;
+  }
+  
+  video::-webkit-media-controls-panel {
+    /* always show video controls */
+    display: flex !important;
+    opacity: 1 !important;
+  }
+</style>
+
+<body>
+  <div id="app" class="container height100p">
+    <div class="row height100p">
+      <div class="col-sm-6 height100p">
+        <div class="screen-wraper">
+          <span class="finger finger-0" style="transform: translate3d(0, 0, 0)"></span>
+          <span class="finger finger-1"></span>
+          <img id="screen" class="screen-img" ondragstart="return false" />
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <h3>{{device.name}}</h3>
+        <hr>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">设备详情</h3>
+          </div>
+          <table class="table">
+            <tbody>
+              <tr>
+                <td>UDID</td>
+                <td v-text="device.udid"></td>
+              </tr>
+              <tr>
+                <td>ScreenSize</td>
+                <td><span v-text="display.width"></span>x<span v-text="display.height"></span></td>
+              </tr>
+              <tr>
+                <td>SessionId</td>
+                <td>
+                  <span v-text="sessionId"></span>
+                  <span @click="refreshSessionId" class="glyphicon glyphicon-refresh cursor-pointer"></span>
+                </td>
+              </tr>
+              <tr>
+                <td>RefreshCount</td>
+                <td><span v-text="refreshCount"></span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="form-group">
+          <button class="btn btn-default" @click="home()">
+            <span class="glyphicon glyphicon-home"></span> Home
+          </button>
+        </div>
+        <div class="form-group">
+          <div class="input-group">
+            <input type="text" class="form-control" v-model="inputText" placeholder="Input text ..." @keyup.enter="sendText(inputText+'\n')">
+            <span class="input-group-btn">
+              <button class="btn btn-default" type="button" @click="sendText(inputText)">SendText</button>
+              <button class="btn btn-default" type="button" @click="clearText(30)">Clear</button>
+            </span>
+          </div>
+        </div>
+        <!-- /input-group -->
+        <div style="display: none">
+          <form class="form-inline">
+            <div class="form-group">
+              <button type="button" class="btn btn-sm" @click="toggleRecord">
+                <span v-if="!record.running" class="color-red glyphicon glyphicon-record"></span>
+                <span v-if="record.running" class="color-red glyphicon glyphicon-stop"></span>
+                录制 <span v-text="record.prompt"></span> <span v-if="record.running">{{record.duration|formatDuration}}</span>
+              </button>
+              <input type="text" class="form-control input-sm" placeholder="Notes 备注">
+            </div>
+          </form>
+          <hr>
+          <div class="list-group">
+            <button v-for="r in records" type="button" @click="play(r)" style="height: 34px; padding: 7px 15px;" class="list-group-item">{{r.name}} camera.mp4 <span class="badge">2:12</span></button>
+          </div>
+          <div>
+            <video width="320" height="240" controls>
+              <source src="" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+            <div id="chart_div"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--<script src="//cdn.jsdelivr.net/jquery/3.1.1/jquery.min.js"></script>-->
+  <script src="//cdn.jsdelivr.net/g/vue@2.1.10,jquery@3.1.1"></script>
+  <script src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script>
+    google.charts.load('current', {
+      packages: ['corechart', 'line']
+    });
+    google.charts.setOnLoadCallback(drawCrosshairs);
+
+    function drawCrosshairs() {
+      var data = new google.visualization.DataTable();
+      data.addColumn('number', 'X');
+      data.addColumn('number', 'Dogs');
+      data.addColumn('number', 'Cats');
+
+      data.addRows([
+        [0, 0, 0],
+        [1, 10, 5],
+        [2, 23, 15],
+        [3, 17, 9],
+        [4, 18, 10],
+        [5, 9, 5],
+        [6, 11, 3],
+        [7, 27, 19],
+        [8, 33, 25],
+        [9, 40, 32],
+        [11, 35, 27],
+        [12, 30, 22],
+        [13, 40, 32],
+        [14, 42, 34],
+        [15, 47, 39],
+        [16, 44, 36],
+        [17, 48, 40],
+        [18, 52, 44],
+        [19, 54, 46],
+        [20, 42, 34],
+        [21, 55, 47],
+        [22, 56, 48],
+        [23, 57, 49],
+        [24, 60, 52],
+        [25, 50, 42],
+        [26, 52, 44],
+        [27, 51, 43],
+        [28, 49, 41],
+        [29, 53, 45],
+        [30, 55, 47],
+        [31, 60, 52],
+        [32, 61, 53],
+        [33, 59, 51],
+        [34, 62, 54],
+        [35, 65, 57],
+        [36, 62, 54],
+        [37, 58, 50],
+        [38, 55, 47],
+        [39, 61, 53],
+        [40, 64, 56],
+        [41, 65, 57],
+        [42, 63, 55],
+        [43, 66, 58],
+      ]);
+
+      var options = {
+        hAxis: {
+          title: 'Time'
+        },
+        vAxis: {
+          title: 'Popularity'
+        },
+        colors: ['#a52714', '#097138'],
+        crosshair: {
+          color: '#000',
+          trigger: 'selection'
+        }
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+
+      chart.draw(data, options);
+      chart.setSelection([{
+        row: 38,
+        column: 1
+      }]);
+      window.chart = chart;
+
+      chart.clearChart()
+
+    }
+  </script>
+  <script>
+    var app = new Vue({
+      el: "#app",
+      // delimiters: ["[[", "]]"],
+      data: {
+        device: {
+          name: '',
+        },
+        display: {
+          width: 0,
+          height: 0,
+          naturalWidth: 0,
+          naturalHeight: 0,
+        },
+        refreshCount: 0,
+        sessionId: null,
+        pageHidden: false,
+        inputText: '',
+        wsAdmin: null,
+        record: {
+          running: false,
+          startTime: 0,
+          ticker: null,
+          duration: 0,
+          prompt: '',
+        },
+        records: [{
+          name: "20170603-test",
+        }]
+      },
+      filters: {
+        formatDuration: function(value) {
+          function pad2(number) {
+            return (number < 10 ? '0' : '') + number
+          }
+          var totalSeconds = Math.floor(value / 1000); //"00:00:00"
+          var mms = value % 1000;
+          var ms = totalSeconds % 60;
+          var mm = (totalSeconds - ms) / 60
+          return "" + pad2(mm) + " : " + pad2(ms);
+        }
+      },
+      mounted: function() {
+        var self = this;
+        document.addEventListener(
+          'visibilitychange',
+          function() {
+            self.pageHidden = document.hidden;
+          }, false
+        )
+        this.refreshScreen();
+        this.initTouchListener();
+        this.initScreenSize();
+        var self = this;
+        $("#screen")[0].onload = function(e) {
+          var nw = e.target.naturalWidth;
+          var nh = e.target.naturalHeight;
+          if (nw && nh && self.display.naturalHeight != nh) {
+            self.display.naturalWidth = nw;
+            self.display.naturalHeight = nh;
+            self.initScreenSize();
+            console.log("Detect screen rotate");
+          }
+        }.bind(this);
+      },
+      methods: {
+        refreshSessionId: function() {
+          $.ajax({
+              url: "/status",
+            })
+            .then(function(ret) {
+              this.sessionId = ret.sessionId;
+            }.bind(this))
+        },
+        toggleRecord: function() {
+          var self = this;
+          if (!this.record.running) {
+            self.record.prompt = "启动中"
+            $.ajax({
+                url: "/api/v1/records",
+                method: "POST",
+              })
+              .done(function(ret) {
+                self.record.running = true;
+                self.record.prompt = "";
+                self.record.startTime = new Date().getTime();
+                self.record.ticker = setInterval(function() {
+                  self.record.duration = new Date().getTime() - self.record.startTime;
+                }.bind(self), 50);
+              })
+              .fail(function(ret) {
+                self.record.prompt = "录制启动失败，原因需要查看后台日志";
+              })
+          } else {
+            self.record.prompt = "结束中"
+            clearInterval(this.record.ticker)
+            $.ajax({
+                url: "/api/v1/records",
+                method: "DELETE",
+              })
+              .done(function(ret) {
+                self.record.running = false;
+                console.log(ret);
+                self.record.prompt = "";
+                var video = document.getElementsByTagName("video")[0];
+                video.src = "/recorddata/20170603-test/camera.mp4";
+                video.load();
+                video.play();
+              })
+              .fail(function(ret) {
+                self.record.prompt = "结束异常";
+              })
+          }
+        },
+        play: function(r) {
+          console.log(r.name);
+          var video = document.getElementsByTagName("video")[0];
+          video.src = "/recorddata/" + r.name + "/camera.mp4";
+          video.load();
+          video.play();
+        },
+        tap: function(x, y) {
+          var self = this;
+          return $.ajax({
+            url: "/session/" + self.sessionId + "/wda/tap/0",
+            method: "POST",
+            data: JSON.stringify({
+              x: x,
+              y: y
+            }),
+          }).then(function(ret) {
+            if (ret.status !== 0) {
+              console.log(ret.value);
+            } else {
+              return "Success";
+            }
+          })
+        },
+        tapHold: function(x, y, duration) {
+          var self = this;
+          return $.ajax({
+            url: "/session/" + self.sessionId + "/wda/touchAndHold",
+            method: "POST",
+            data: JSON.stringify({
+              x: x,
+              y: y,
+              duration: duration / 1000, // unit second
+            }),
+          }).then(function(ret) {
+            if (ret.status !== 0) {
+              console.log(ret.value);
+            } else {
+              return "Success";
+            }
+          })
+        },
+        swipe: function(fromX, fromY, toX, toY) {
+          var self = this;
+          return $.ajax({
+            url: "/session/" + self.sessionId + "/wda/dragfromtoforduration",
+            method: "POST",
+            data: JSON.stringify({
+              fromX: fromX,
+              fromY: fromY,
+              toX: toX,
+              toY: toY,
+              duration: 0,
+            })
+          })
+        },
+        home: function() {
+          return $.ajax({
+              url: "/wda/homescreen",
+              method: "POST",
+            })
+            .then(function(ret) {
+              console.log(ret);
+            })
+        },
+        clearText: function(n) {
+          this.sendText("\b".repeat(n || 30))
+        },
+        sendText: function(text) {
+          return $.ajax({
+              url: "/session/" + this.sessionId + "/wda/keys",
+              method: "POST",
+              data: JSON.stringify({
+                value: text.split('')
+              })
+            })
+            .then(function(ret) {
+              console.log(ret);
+            })
+        },
+        refreshScreen: function() {
+          if (this.pageHidden) {
+            console.log("Hidden");
+            setTimeout(this.refreshScreen, 200);
+            return;
+          }
+          return $.getJSON("/screenshot")
+            .done(function(ret) {
+              var imgSrc = "data:image/png;base64," + ret.value;
+              $("#screen").attr("src", imgSrc);
+              this.refreshCount += 1;
+              setTimeout(this.refreshScreen, 200);
+            }.bind(this))
+            .fail(function(ret) {
+              console.log("load screen failed", ret)
+                // alert("Load screen failed");
+            })
+        },
+        initScreenSize: function() {
+          $.ajax({
+              url: "/status",
+            })
+            .then(function(ret) {
+              this.sessionId = ret.sessionId;
+              Object.assign(this.device, ret.value.device);
+              return $.ajax({
+                url: "/session/" + ret.sessionId + "/window/size",
+              })
+            }.bind(this))
+            .then(function(ret) {
+              this.display.width = ret.value.width;
+              this.display.height = ret.value.height;
+            }.bind(this))
+        },
+        initTouchListener: function() {
+          var self = this;
+          var element = $("#screen")[0];
+          var screen = {
+            bounds: {},
+            firstPosition: {},
+            secondPosition: {},
+            beginTime: null,
+          }
+          var _longClickTimeout = 800;
+
+          function calculateBounds() {
+            var el = element;
+            screen.bounds.w = el.offsetWidth
+            screen.bounds.h = el.offsetHeight
+            screen.bounds.x = 0
+            screen.bounds.y = 0
+
+            while (el.offsetParent) {
+              screen.bounds.x += el.offsetLeft
+              screen.bounds.y += el.offsetTop
+              el = el.offsetParent
+            }
+          }
+
+          function deactiveFinger(index) {
+            $(".finger-" + index).removeClass("active").removeClass("longClick")
+          }
+
+          function convertPosition(event) {
+            var e = event;
+            if (e.originalEvent) {
+              e = e.originalEvent
+            }
+            // Ignore mouse right click
+            if (e.which === 3) {
+              return;
+            }
+            e.preventDefault()
+            calculateBounds()
+            var x = e.pageX - screen.bounds.x
+            var y = e.pageY - screen.bounds.y
+            return {
+              e: e,
+              x: Math.floor(x / element.clientHeight * self.display.height),
+              y: Math.floor(y / element.clientHeight * self.display.height),
+              pageX: x,
+              pageY: y,
+            }
+          }
+
+          function stopMousing() {
+            element.removeEventListener('mousemove', mouseMoveListener);
+            document.removeEventListener('mouseup', mouseUpListener);
+          }
+
+          function mouseUpListener(event) {
+            var p = convertPosition(event);
+            stopMousing()
+
+            var first = screen.firstPosition,
+              second = screen.secondPosition;
+
+            screen.secondPosition = {};
+            element.style.cursor = 'not-allowed'
+            clearTimeout(screen.longClickKey);
+            var defer;
+            if (second && (second.x || second.y)) {
+              console.log("Swipe", first, second);
+              defer = self.swipe(first.x, first.y, second.x, second.y);
+            } else {
+              var holdTime = new Date().getTime() - screen.beginTime;
+              if (holdTime > _longClickTimeout) {
+                console.log("LongTap", first);
+                defer = self.tapHold(first.x, first.y, holdTime)
+              } else {
+                console.log("Tap", first);
+                defer = self.tap(first.x, first.y)
+              }
+            }
+            defer.then(function() {
+              console.log("Release operation")
+              deactiveFinger(0);
+              deactiveFinger(1);
+              element.style.cursor = 'auto'
+            })
+          }
+
+          function mouseMoveListener(event) {
+            var p = convertPosition(event);
+            var first = screen.firstPosition;
+            var distance = Math.sqrt((first.x - p.x) * (first.x - p.x) + (first.y - p.y) * (first.y - p.y));
+            if (distance > 10) {
+              screen.secondPosition = {
+                x: p.x,
+                y: p.y
+              };
+              console.log(p);
+              $(".finger-1")
+                .addClass("active")
+                .css("transform", 'translate3d(' + p.pageX + 'px,' + p.pageY + 'px,0)')
+            } else {
+              deactiveFinger("1");
+              screen.secondPosition = {};
+            }
+          }
+
+          function mouseDownListener(event) {
+            if (element.style.cursor == 'not-allowed') {
+              return;
+            }
+            var p = convertPosition(event);
+            var index = 0;
+            $(".finger-" + index)
+              .addClass("active")
+              .css("transform", 'translate3d(' + p.pageX + 'px,' + p.pageY + 'px,0)')
+
+            screen.longClickKey = setTimeout(function() {
+              $(".finger-0").addClass("longClick");
+            }, _longClickTimeout)
+
+            screen.beginTime = new Date().getTime();
+            screen.firstPosition = {
+              x: p.x,
+              y: p.y
+            }
+
+            element.addEventListener('mousemove', mouseMoveListener);
+            document.addEventListener('mouseup', mouseUpListener);
+          }
+          element.addEventListener("mousedown", mouseDownListener);
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>

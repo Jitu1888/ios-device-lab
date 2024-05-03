@@ -1,0 +1,29 @@
+{
+    "xcode_dev_team_id": "E75UYQGF7U",
+    "stf": {
+        "ip": "192.168.113.95",
+        "hostname": "jenkins-lab4"
+    },
+    "network": {
+        "coordinator_port": 8027,
+        "video": "8000-8005",
+        "dev_ios": "9240-9250",
+        "vnc": "5901-5911",
+        "wda": "8100-8105",
+        "interface": "en0"
+    },
+    "video": {
+        "enabled": true,
+        "use_vnc": false,
+        "vnc_scale": 2,
+        "vnc_password": "",
+        "frame_rate": 30
+    },
+    "install": {
+        "root_path": "/Users/jenkins-lab4/Documents/Backup/stf_ios_support",
+        "config_path": "/Users/jenkins-lab4/Documents/Backup/stf_ios_support/config.json"
+    },
+    "bin_paths": {
+    "node": "/usr/local/opt/node@18/bin/node"
+  }
+}
