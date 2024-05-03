@@ -3,28 +3,28 @@
 [Actual instruction for deploy service on 2023/08/09](docs/DEPLOYMENT.md)
 
 ### Prerequisites
-1. A machine running MacOS ( to build and run the "provider" )
-1. A machine running Linux with Docker container support ( to run the STF server )
+1. A machine running MacOS and run STF server on the same mac machine
+
 
 ### Build machine setup
 1. Clone this repo down to your build machine
-1. Install XCode
-1. Add your developer Apple ID to XCode
+2. Install XCode
+3. Add your developer Apple ID to XCode
 
     1. XCode -> XCode menu -> Preferences -> Accounts Tab
     1. Click `+` under `Apple IDs` list
     1. Choose `Apple ID`
     1. Login to your account
-1. Download a "Apple Development certificate" for your user
+4. Download a "Apple Development certificate" for your user
 
 	1. Continue from previous step, right after logging into your Developer account in Xcode
     1. Select `Manage Certificates`
     1. Click `+` in the lower left corner
     1. Select `Apple Development`
-1. Clone the various needed repos ( includes WebDriverAgent )
+5. Clone the various needed repos ( includes WebDriverAgent )
 
     1. Run `make clone`
-1. Configure WebDriverAgent to use your identity for signing
+6. Configure WebDriverAgent to use your identity for signing
 
     1. Open `repos/WebDriverAgent/WebDriverAgent.xcodeproj` in XCode
     1. Select the WebDriverAgentLib target
@@ -33,10 +33,10 @@
     1. Select the WebDriverAgentRunner target
     1. Go to the `Signing & Capabilities` tab
     1. Select your team under `Team`
-1. Run `./init.sh`
+7. Run `./init.sh`
 
 ### Deploy server side:
-1. On your Linux machine
+1. On the same mac machine
     1. Copy `server` folder to your Linux machine
     1. Run `server/cert/gencert.sh` to generate a self-signed cert ( or use your own )
     1. Note! Plain http STF server is not supported. It can be done, but it shouldn't and tickets to make it so will be closed.
